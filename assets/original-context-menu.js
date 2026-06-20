@@ -48,9 +48,19 @@
         position: relative;
         top: 0.15em;
       }
-      .tc-original-menu .katex { color: #172033; }
+      .tc-original-menu .katex { 
+        color: #172033; 
+        max-width: none !important;
+        overflow-x: visible !important;
+        overflow-y: visible !important;
+      }
       .tc-original-menu .katex * { box-sizing: content-box; }
-      .tc-original-menu .katex-display { overflow-x: auto; overflow-y: hidden; }
+      .tc-original-menu .katex-display, .tc-original-menu d-math[block] { 
+        overflow-x: auto !important; 
+        overflow-y: hidden !important; 
+        max-width: 100% !important;
+        display: block !important;
+      }
       .tc-resizer { position: absolute; z-index: 10; }
       .tc-resizer-t { top: -4px; left: 10px; right: 10px; height: 8px; cursor: n-resize; }
       .tc-resizer-b { bottom: -4px; left: 10px; right: 10px; height: 8px; cursor: s-resize; }
@@ -375,9 +385,24 @@
         }
 
         const origId = bestEl.getAttribute("data-original-id");
-        if (origId) {
-          const url = SOURCE_URL + (SOURCE_URL.includes("#") ? "" : "#") + origId;
-          window.open(url, "_blank");
+        if (origId && byId.has(origId)) {
+          const item = byId.get(origId);
+          const temp = document.createElement("div");
+          temp.innerHTML = item.text;
+          const plain = (temp.textContent || temp.innerText || "").trim().replace(/\s+/g, " ");
+          
+          let fragment = "";
+          if (plain.length > 0) {
+            const prefix = plain.substring(0, 30).trim();
+            const suffix = plain.length > 60 ? plain.substring(plain.length - 30).trim() : "";
+            if (suffix) {
+              fragment = `#:~:text=${encodeURIComponent(prefix)},${encodeURIComponent(suffix)}`;
+            } else {
+              fragment = `#:~:text=${encodeURIComponent(prefix)}`;
+            }
+          }
+          const baseUrl = SOURCE_URL.split('#')[0];
+          window.open(baseUrl + fragment, "_blank");
         } else if (SOURCE_URL) {
           window.open(SOURCE_URL, "_blank");
         }
