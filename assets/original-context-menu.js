@@ -417,9 +417,17 @@
           let targetIndex = DATA.findIndex(d => d.id === origId);
           if (targetIndex !== -1) {
             for (let i = targetIndex; i >= 0; i--) {
-              const match = DATA[i].text.match(/id=["']([^"']+)["']/);
-              if (match && DATA[i].tag.match(/^h[1-6]$/i)) {
-                closestHeadingId = match[1];
+              if (DATA[i].tag.match(/^h[1-6]$/i)) {
+                const match = DATA[i].text.match(/id=["']([^"']+)["']/);
+                if (match) {
+                  closestHeadingId = match[1];
+                } else {
+                  // Fallback: slugify the heading text (matches distill template behavior)
+                  const tempHeading = document.createElement("div");
+                  tempHeading.innerHTML = DATA[i].text;
+                  const plainHeading = (tempHeading.textContent || tempHeading.innerText || "").trim().toLowerCase();
+                  closestHeadingId = plainHeading.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+                }
                 break;
               }
             }
@@ -432,10 +440,15 @@
           const supportsTextFragments = ('fragmentDirective' in document);
 
           if (supportsTextFragments && fragment) {
-            // Use Text Fragments for exact paragraph highlight
-            finalUrl += fragment;
+            if (closestHeadingId) {
+              // Combine ID and Text Fragment!
+              // If text fragment fails (e.g. due to KaTeX), browser falls back to heading ID!
+              finalUrl += "#" + closestHeadingId + fragment.replace("#", "");
+            } else {
+              finalUrl += fragment;
+            }
           } else if (closestHeadingId) {
-            // Fallback: use the closest heading ID for Firefox, Safari, and older mobile browsers
+            // Fallback: use the closest heading ID for older browsers
             finalUrl += "#" + closestHeadingId;
           } else if (fragment) {
             // Last resort
