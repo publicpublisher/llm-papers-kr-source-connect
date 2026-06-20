@@ -391,6 +391,13 @@
           temp.innerHTML = item.text;
           const plain = (temp.textContent || temp.innerText || "").trim().replace(/\s+/g, " ");
           
+          // Text Fragments(#:~:text=) 인코딩 전용 헬퍼.
+          // encodeURIComponent()는 '-'를 인코딩하지 않지만, WICG Text Fragments 스펙은
+          // start/end 토큰 안에 인코딩되지 않은 '-'가 하나라도 있으면 해당 디렉티브 전체를 파싱 실패 처리한다.
+          function encodeTextFragment(str) {
+            return encodeURIComponent(str).replace(/-/g, "%2D");
+          }
+
           let fragment = "";
           if (plain.length > 0) {
             const words = plain.split(/\s+/).filter(w => w.length > 0);
@@ -398,9 +405,9 @@
               const prefix = words.slice(0, 6).join(" ");
               const suffix = words.length > 12 ? words.slice(-6).join(" ") : "";
               if (suffix) {
-                fragment = `#:~:text=${encodeURIComponent(prefix)},${encodeURIComponent(suffix)}`;
+                fragment = `#:~:text=${encodeTextFragment(prefix)},${encodeTextFragment(suffix)}`;
               } else {
-                fragment = `#:~:text=${encodeURIComponent(prefix)}`;
+                fragment = `#:~:text=${encodeTextFragment(prefix)}`;
               }
             }
           }
