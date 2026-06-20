@@ -393,12 +393,15 @@
           
           let fragment = "";
           if (plain.length > 0) {
-            const prefix = plain.substring(0, 30).trim();
-            const suffix = plain.length > 60 ? plain.substring(plain.length - 30).trim() : "";
-            if (suffix) {
-              fragment = `#:~:text=${encodeURIComponent(prefix)},${encodeURIComponent(suffix)}`;
-            } else {
-              fragment = `#:~:text=${encodeURIComponent(prefix)}`;
+            const words = plain.split(/\s+/).filter(w => w.length > 0);
+            if (words.length > 0) {
+              const prefix = words.slice(0, 6).join(" ");
+              const suffix = words.length > 12 ? words.slice(-6).join(" ") : "";
+              if (suffix) {
+                fragment = `#:~:text=${encodeURIComponent(prefix)},${encodeURIComponent(suffix)}`;
+              } else {
+                fragment = `#:~:text=${encodeURIComponent(prefix)}`;
+              }
             }
           }
 
