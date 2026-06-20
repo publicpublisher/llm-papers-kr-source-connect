@@ -401,8 +401,38 @@
               fragment = `#:~:text=${encodeURIComponent(prefix)}`;
             }
           }
+
+          // Fallback: find closest preceding heading ID
+          let closestHeadingId = "";
+          let targetIndex = DATA.findIndex(d => d.id === origId);
+          if (targetIndex !== -1) {
+            for (let i = targetIndex; i >= 0; i--) {
+              const match = DATA[i].text.match(/id=["']([^"']+)["']/);
+              if (match && DATA[i].tag.match(/^h[1-6]$/i)) {
+                closestHeadingId = match[1];
+                break;
+              }
+            }
+          }
+
           const baseUrl = SOURCE_URL.split('#')[0];
-          window.open(baseUrl + fragment, "_blank");
+          
+          let finalUrl = baseUrl;
+          // Feature detect Text Fragment support (reliable for Chromium-based browsers)
+          const supportsTextFragments = ('fragmentDirective' in document);
+
+          if (supportsTextFragments && fragment) {
+            // Use Text Fragments for exact paragraph highlight
+            finalUrl += fragment;
+          } else if (closestHeadingId) {
+            // Fallback: use the closest heading ID for Firefox, Safari, and older mobile browsers
+            finalUrl += "#" + closestHeadingId;
+          } else if (fragment) {
+            // Last resort
+            finalUrl += fragment;
+          }
+          
+          window.open(finalUrl, "_blank");
         } else if (SOURCE_URL) {
           window.open(SOURCE_URL, "_blank");
         }
