@@ -1,0 +1,23 @@
+{
+  "rebuilt_from_live_original": true,
+  "l_body_figures_restored_from_live": true,
+  "source_l_body_figures": 39,
+  "final_l_body_figures": 39,
+  "source_d_math": 102,
+  "final_d_math": 102,
+  "d_math_light_mismatches": 0,
+  "source_svg": 3,
+  "final_svg": 3,
+  "svg_with_hangul": 0,
+  "math_with_hangul": 0,
+  "protected_tokens": 0,
+  "script_tags_source": 24,
+  "script_tags_final": 24,
+  "inline_exec_scripts": 22,
+  "inline_exec_script_syntax_errors": [],
+  "external_js_path_relative": true,
+  "d_cite_source": 74,
+  "d_cite_final": 74,
+  "ao_diff_original_restored": true,
+  "reward_prompt_original_restored": true
+}
